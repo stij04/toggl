@@ -1,62 +1,43 @@
-'use client'
-import { useRouter } from 'next/navigation'
-import { TimeEntry } from '@/types/timeEntry'
-import { useEffect, useState } from 'react'
-import { Input } from '@/components/Input'
-import { formatDate } from '@/helpers/formatDate'
-import { createTE } from '@/clientCalls/timeEntries'
-import { ProjectSelector } from '@/components/ProjectSelector'
+import React, {useState} from 'react'
+import {Input} from '@/components/Input'
+import {TimeEntry} from "@/types/timeEntry";
+import {ProjectSelector} from "@/components/ProjectSelector";
 
-const initValue: TimeEntry = {
-  end: '',
-  start: '',
-  task: '',
-  project_id: 4,
-  user_name: process.env.NEXT_PUBLIC_USERNAME
+type Props = {
+    initialValues: TimeEntry
+    onSave: (timeEntry: TimeEntry) => void
+    onCancel: () => void
 }
 
-export const TimeForm = () => {
-  const router = useRouter()
-  const [timeEntry, setTimeEntry] = useState<TimeEntry>(initValue)
+export const TimeForm = ({initialValues, onSave, onCancel}: Props) => {
+    const [timeEntry, setTimeEntry] = useState(initialValues)
 
-  useEffect(() => {
-    if (timeEntry.start && timeEntry.end && timeEntry.task) {
-      createTE(timeEntry)
-        .then(() => {
-          setTimeEntry(initValue)
-          router.refresh()
-        })
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target
+        setTimeEntry({...timeEntry, [name]: value})
     }
-  }, [router, timeEntry])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target
-    setTimeEntry({ ...timeEntry, [name]: value})
-  }
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const {name, value} = e.target
+        setTimeEntry({...timeEntry, [name]: value})
+    }
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const {name, value} = e.target
-    setTimeEntry({ ...timeEntry, [name]: value})
-  }
-  return (
-    <form className="flex flex-wrap items-end">
-      <Input label="Task" name="task" value={timeEntry.task} onChange={handleChange} />
-      <Input label="Start" name="start" value={timeEntry.start} onChange={handleChange} type="datetime-local" />
-      <Input label="End" name="end" value={timeEntry.end} onChange={handleChange} type="datetime-local" />
-      <ProjectSelector name="project_id" value={timeEntry.project_id} handleChange={handleSelectChange} />
-      {timeEntry.start && (
-        <button
-          className="btn btn-neutral"
-          disabled={timeEntry.end !== ''}
-          onClick={() => {setTimeEntry({...timeEntry, end: formatDate(new Date())})}}
-        >Stop</button>
-      )}
-      {!timeEntry.start && (
-        <button
-          className="btn btn-neutral"
-          onClick={() => {setTimeEntry({...timeEntry, start: formatDate(new Date())})}}
-        >Start</button>
-      )}
-    </form>
-  )
+    const handleSave = (e: React.FormEvent) => {
+        e.preventDefault()
+        onSave(timeEntry)
+    }
+
+    return (
+        <form onSubmit={handleSave}>
+            <Input label="Task" name="task" value={timeEntry.task} onChange={handleChange}/>
+            <Input label="Start" name="start" value={timeEntry.start} onChange={handleChange} type="datetime-local"/>
+            <Input label="End" name="end" value={timeEntry.end} onChange={handleChange} type="datetime-local"/>
+
+            <ProjectSelector name="project_id" value={timeEntry.project_id} handleChange={handleSelectChange}/>
+            <div className="modal-action">
+                <button className="btn btn-primary" onClick={handleSave}>Save</button>
+                <button className="btn btn-neutral" onClick={onCancel}>Close</button>
+            </div>
+        </form>
+    )
 }

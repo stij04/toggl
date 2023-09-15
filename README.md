@@ -1,3 +1,13 @@
+## Toggl clone
+- Autor: Jan Štípek
+- Xname: stij04
+
+## Co jsem doplnil
+
+- Filtrování projektů podle majitele pomocí komponenty select na stránce s projekty
+- Možnost editace time entries na stránce time - operace CRUD
+- Stránka s reporty umožňuje výběr projektu pomocí komponenty select a obsahuje výpis seskupený po jednotlivých dnech, ve kterých se na vybraném projektu pracovalo a celkový čas strávený prací na tomto projektu v konkrétních dnech
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
